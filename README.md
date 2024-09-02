@@ -6,4 +6,4 @@
 | Dellven Thomas  | Dellven83  | VCK325 |
 | Garrett Wright  | Content Cell  | YYK649 |
 | John Earl  | Content Cell  | WNQ516 |
-| Trent Hobbs  | trent-hobbs  | DSC562 |
+| Trent Hobbs  | Trent-Hobbs  | DSC562 |
