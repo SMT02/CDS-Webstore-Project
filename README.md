@@ -1,4 +1,4 @@
-# CPSC 4900 CDS-Webstore-Project
+# CPSC 4900 CDS-Webstore-Project for Elysian Furnishings
 
 | Full Name  | GitHub Username |  UTC ID  |
 | ------------- | ------------- | ------------- | 
