@@ -59,16 +59,17 @@ body {
 }
 
 / Animated underline for certain nav elements, width is changed again when in submenu and less than 600px */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 1000px) {
     .topnav a.active::before,
     .topnav a.textButton::before {
-        width: 100%;
+        width: 40%;
         left: 0%;
     }
 }
 
 /* Animated underline for certain nav elements, width is changed again when in submenu and less than 600px */
 @media screen and (max-width: 600px) {
+    .topnav a.active::before,
     .topnav a.textButton::before {
         width: 100%;   
         left: 0%;   
@@ -265,3 +266,4 @@ body {
     padding-bottom: 20px;
     padding-top: 20px;
 }
+
