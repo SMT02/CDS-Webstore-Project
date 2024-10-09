@@ -49,27 +49,21 @@ body {
     opacity: 70%;
 }
 
-/* Animated underline for certain nav elements */
-.topnav a.active::before,
-.topnav a.subMenu::before,
-.topnav a.textButton::before {
-    content: "";
-    position: absolute;
-    display: block;
-    width: calc(100% - 32px);
-    height: 2px;
-    bottom: 20px;
-    left: 50%;
-    background-color: #000;
-    transform: translateX(-50%) scaleX(0);
-    transition: transform 0.3s ease;
+/* Animated underline for certain nav elements, width is changed when in submenu /
+@media screen and (max-width: 1000px) {
+    .topnav a.active::before,
+    .topnav a.textButton::before {
+        width: 40%;
+        left: 0%;
+    }
 }
 
-/* Animated underline for certain nav elements, width is changed when in submenu */
-@media screen and (max-width: 1000px) {
+/ Animated underline for certain nav elements, width is changed again when in submenu and less than 600px */
+@media screen and (max-width: 600px) {
+    .topnav a.active::before,
     .topnav a.textButton::before {
-        width: 40%;   
-        left: 0%;   
+        width: 100%;
+        left: 0%;
     }
 }
 
