@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Updated imports for v6
 import './styles.css';
 import Navbar from './components/Navbar';
 import ProductList from './components/ProductList';
@@ -12,20 +12,23 @@ function App() {
   return (
     <Router>
       <Navbar />
-      <Switch>
-        <Route exact path="/" component={() => (
-          <>
-            <div className="mainImage">
-              <img className="responsiveImg" src="/img/backgroundmain.jpg" alt="Main Background" />
-            </div>
-            <ProductList />
-          </>
-        )} />
-        <Route path="/chairs" component={Chairs} />
-        <Route path="/sofas" component={Sofas} />
-        <Route path="/tables" component={Tables} />
-        <Route path="/beds" component={Beds} />
-      </Switch>
+      <Routes>
+        <Route 
+          path="/" 
+          element={
+            <>
+              <div className="mainImage">
+                <img className="responsiveImg" src="/img/backgroundmain.jpg" alt="Main Background" />
+              </div>
+              <ProductList />
+            </>
+          } 
+        />
+        <Route path="/chairs" element={<Chairs />} />
+        <Route path="/sofas" element={<Sofas />} />
+        <Route path="/tables" element={<Tables />} />
+        <Route path="/beds" element={<Beds />} />
+      </Routes>
       <div className="footer">
         <p>©Copyright Elysian Furnishings 2024</p>
         <p>Email: Elysian@email.com</p>
