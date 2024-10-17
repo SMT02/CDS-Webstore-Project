@@ -1,0 +1,240 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #eaeae5;
+    font-family: sans-serif;
+}
+
+/* Main content is set to 70% of the width of the screen */
+.MainPageContent {
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 50px 0;
+}
+
+/* Responsive layout, makes main content wider when screen is less than 600px */
+@media screen and (max-width: 600px) {
+    .MainPageContent {
+        width: 90%; 
+    }   
+}
+
+/* --------------------------- Navbar ------------------------------- */
+/* Navbar styles */
+.topnav {
+    position: sticky;
+    top: 0;
+    overflow: hidden;
+    background-color: #d1c7b0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+}
+
+/* Formatting for nav elements */
+.topnav a {
+    float: left;
+    display: block;
+    color: black;
+    text-align: center;
+    padding: 24px 16px; 
+    text-decoration: none;
+    font-size: 17px; 
+    font-family: sans-serif;
+    position: relative;
+    transition: opacity 0.3s ease;
+}
+
+/* Hover effect for nav links */
+.topnav a:hover {
+    opacity: 70%;
+}
+
+/* Animated underline for certain nav elements */
+.topnav a.active::before,
+.topnav a.subMenu::before,
+.topnav a.textButton::before {
+    content: "";
+    position: absolute;
+    display: block;
+    width: calc(100% - 32px);
+    height: 2px;
+    bottom: 20px;
+    left: 50%;
+    background-color: #000;
+    transform: translateX(-50%) scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+/* Hover effect for animated underline */
+.topnav a.textButton:hover::before {
+    transform: translateX(-50%) scaleX(1);
+}
+
+/* Home button image */
+.homeButton img {
+    width: 70px;
+    vertical-align: bottom; 
+}
+
+/* Formatting for submenu (hamburger icon) */
+.subMenu {
+    display: none;  
+    cursor: pointer;
+    padding: 16px;  
+}
+
+/* Show the hamburger menu and hide links for smaller screens */
+@media screen and (max-width: 1000px) {
+    .topnav a.textButton,
+    .topnav .search {
+        display: none;  
+    }
+    .subMenu {
+        display: block; 
+        position: absolute;
+        right: 20px;
+        top: 16px;
+    }
+}
+
+/* Styling for the responsive navbar when it is active */
+@media screen and (max-width: 1000px) {
+    .topnav.responsive {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .topnav.responsive a {
+        float: none;
+        display: block;
+        text-align: left;
+        padding: 16px;
+    }
+}
+
+/* Main Background Image */
+.mainImage img {
+    width: 100%;
+    height: 600px; 
+    object-fit: cover; 
+}
+
+@media screen and (max-width: 1000px) {
+    .mainImage img {
+        height: 400px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .mainImage img {
+        height: 300px;
+    }
+}
+
+/* ----------------- Image Grid ----------------- */
+.product-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(350px, 1fr)); 
+    grid-gap: 20px;
+    padding: 20px;
+    justify-items: center;  
+}
+
+.product {
+    border-radius: 10px;
+    overflow: hidden;
+    max-width: 350px;
+    margin: auto;
+}
+
+.product img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    transition: transform 1.1s; 
+}
+
+.product:hover img {
+    transform: scale(1.2); 
+}
+
+/* Responsive layout for product list */
+@media screen and (max-width: 1000px) {
+    .product-list {
+        grid-template-columns: 1fr; 
+    }
+    .product img {
+        max-width: 90%;  
+    }
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    font-size: 12px;
+    color: #737373;
+    width: 100%;
+    padding-bottom: 20px;
+    padding-top: 20px;
+}
+
+/* Formatting for search bar */
+.search {
+    float: left;
+    padding: 18px 16px;
+}
+
+.searchBar {
+    padding: 6px;
+    border: none;
+    border-bottom: 2px solid;
+    border-color: black;
+    background-color: #d1c7b0;
+    outline: none;
+    text-align: right;
+    transition: background-color 0.3s ease;
+    border-radius: 10px 10px 0 0;
+}
+
+.searchBar:hover, .searchBar:focus {
+    background-color: #d7d3c9;
+}
+
+.searchButton {
+    border: none;
+    background-color: #d1c7b0;
+    padding-right: 16px;
+    bottom: 1;
+    position: absolute;
+    transition: opacity 0.3s ease;
+}
+
+.searchButton:hover {
+    opacity: 70%;
+    cursor: pointer;
+}
+
+/* Special Formatting for Icons */
+#light, #dark, #wish, #cart {
+    padding-bottom: 13px;
+    padding-top: 20px;
+}
+
+#light {
+    padding-right: 1px;
+}
+
+#dark {
+    padding-left: 1px;
+}
+
+#wish {
+    padding-right: 3px;
+}
+
+#cart {
+    padding-left: 3px;
+}
