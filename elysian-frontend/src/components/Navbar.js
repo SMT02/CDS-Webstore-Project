@@ -38,15 +38,15 @@ function Navbar() {
         <img src="/img/Cart2.png" width="27px" alt="Cart" />
       </Link>
 
-      {/* Hamburger Menu for smaller screens - Changed to button for accessibility */}
-      <button className="subMenu" onClick={toggleMenu} aria-label="Toggle Menu">
+      {/* Hamburger Menu for smaller screens - Changed to button for accessibility - how about noooo, it doesn't work properly as a button */}
+      <a className="subMenu" onClick={toggleMenu} aria-label="Toggle Menu">
         <img
           id="menuIcon"
           src={`/img/${isResponsive ? 'CloseIcon.png' : 'Hamburger%20Menu%20Icon2.png'}`}
           width="24px"
           alt="Menu"
         />
-      </button>
+      </a>
 
       {/* Search bar */}
       <div className="search">
