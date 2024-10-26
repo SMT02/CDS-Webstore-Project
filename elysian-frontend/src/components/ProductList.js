@@ -11,7 +11,7 @@ function ProductList() {
 
   return (
     <div className="MainPageContent">
-      <div className="product-list">
+      <div className="product-listHome">
         {products.map((product, index) => (
           <div className="product" key={index}>
             <a href={product.link}>
