@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import '../styles.css'; // Ensure you are importing the CSS correctly
 
 function Navbar() {
@@ -18,23 +18,23 @@ function Navbar() {
       </div>
 
       {/* Traditional navigation links */}
-      <Link to="/chairs" className="textButton">Chairs</Link>
-      <Link to="/sofas" className="textButton">Sofas</Link>
-      <Link to="/tables" className="textButton">Tables</Link>
-      <Link to="/beds" className="textButton">Beds</Link>
-      <Link to="/login" className="textButton">Login / Sign Up</Link>
+      <NavLink to="/chairs" className="textButton">Chairs</NavLink>
+      <NavLink to="/sofas" className="textButton">Sofas</NavLink>
+      <NavLink to="/tables" className="textButton">Tables</NavLink>
+      <NavLink to="/beds" className="textButton">Beds</NavLink>
+      <NavLink to="/login" className="textButton">Login / Sign Up</NavLink>
 
       {/* Icons */}
       <a href="#light-mode" id="light" className="icon">
         <img src="/img/Light3.png" width="27px" alt="Light Mode" />
       </a>
-      <a href="#dark-mode" id="dark" className="icon">
+      <a href="#dark-mode" id="dark" className={`icon ${isResponsive ? 'responsive-padding' : ''}`}>
         <img src="/img/Dark2.png" width="27px" alt="Dark Mode" />
       </a>
       <Link to="/wishlist" id="wish" className="icon">
         <img src="/img/Wishlist2.png" width="27px" alt="Wishlist" />
       </Link>
-      <Link to="/cart" id="cart" className="icon">
+      <Link to="/cart" id="cart" className={`icon ${isResponsive ? 'responsive-padding' : ''}`}>
         <img src="/img/Cart2.png" width="27px" alt="Cart" />
       </Link>
 
