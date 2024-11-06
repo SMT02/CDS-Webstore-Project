@@ -1,0 +1,17 @@
+/* Container for the product image in product details */
+.product-detail-image-container {
+    width: 900px; /* Set the container width */
+    max-width: 100%; /* Make responsive */
+    margin: 0 auto; /* Center the image horizontally */
+    display: flex;
+    justify-content: center;
+}
+
+/* Style for the product detail image */
+.product-detail-image {
+    width: 100%; /* Image fills the container */
+    height: auto; /* Maintain aspect ratio */
+    object-fit: contain; /* Ensure it doesn't stretch */
+    border-radius: 8px; /* Optional styling for rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow for styling */
+}
