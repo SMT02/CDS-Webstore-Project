@@ -3,8 +3,98 @@ body {
     padding: 0;
     background-color: #eaeae5;
     font-family: sans-serif;
+    transition: background-color 0.5s ease, color 0.5s ease;
 }
 
+/*Dark Mode here*/
+
+.dark-mode {
+    background-color: #444a45;
+    color: #d9d9d9;
+}
+
+.dark-mode .textButton {
+    color: #d9d9d9;
+}
+
+.dark-mode .textButton:hover {
+    opacity: 0.7;
+}
+
+.dark-mode .textButton.active {
+    color: #d9d9d9;
+    background-color: transparent;
+}
+
+.dark-mode .icon {
+    background-color: transparent;
+    border: none;
+    color: #d9d9d9;
+}
+
+.dark-mode .icon img {
+    filter: brightness(0) invert(1);
+}
+
+.dark-mode .icon:hover {
+    background-color: transparent;
+}
+.dark-mode-search {
+    background-color: #444a45; /* Dark mode background color */
+    color: #d9d9d9; /* Dark mode text color */
+    border: 1px solid #666; /* Adjust border if needed */
+}
+
+.light-mode-search {
+    background-color: #ffffff; /* Light mode background color */
+    color: #000000; /* Light mode text color */
+    border: 1px solid #ccc; /* Adjust border if needed */
+}
+
+/* Add any hover effects */
+.dark-mode-search.hover, .light-mode-search.hover {
+    border-color: #888; /* Change border color on hover */
+}
+/* Global color change for text in dark mode */
+.dark-mode, 
+.dark-mode h1, 
+.dark-mode h2, 
+.dark-mode h3, 
+.dark-mode h4, 
+.dark-mode h5, 
+.dark-mode h6, 
+.dark-mode p, 
+.dark-mode span, 
+.dark-mode li, 
+.dark-mode a {
+    color: #d9d9d9;
+}
+
+/* Ensure input and button elements change text color in dark mode */
+.dark-mode input, 
+.dark-mode button, 
+.dark-mode textarea, 
+.dark-mode select {
+    color: #d9d9d9;
+    background-color: #444a45;
+    border-color: #666;
+}
+
+/* For buttons and interactive elements */
+.dark-mode .button, 
+.dark-mode .textButton {
+    color: #d9d9d9;
+}
+
+/* Hover effects for links */
+.dark-mode a:hover {
+    opacity: 0.7;
+}
+.dark-mode .product p,
+.dark-mode .productHeaderDescription,
+.dark-mode .footer {
+    color: #d9d9d9; /* Change this color as needed for dark mode */
+}
 /* --Custom Scrollbar and highlight text color (Optional)-- */
 
 /* width */
@@ -51,6 +141,7 @@ body {
     width: 70%;
     margin-left: auto;
     margin-right: auto;
+    padding: 50px 0;
 }
 
 /* Responsive layout, makes main content wider when screen is less than 600px */
@@ -68,8 +159,20 @@ body {
     overflow: hidden;
     background-color: #d1c7b0;
     z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    transition: background-color 0.5s ease, color 0.5s ease;
 }
 
+.topnav.dark-mode {
+    background-color: #778078;
+}
+
+.topnnav.dark-mode a {
+    color: #d9d9d9;
+}
 /* Formatting for nav elements */
 .topnav a {
     float: left;
@@ -106,7 +209,15 @@ body {
     transform: translateX(-50%) scaleX(0);
     transition: transform 0.3s ease;
 }
+.topnav a.textButton:hover::before,
+.topnav a.textButton.active::before {
+    transform: translateX(-50%) scaleX(1);
+}
 
+/* Remove underline effect from icon links */
+.topnav a.icon::before {
+    content: none; /* Ensure no underline appears on icons */
+}
 /* Animated underline for certain nav elements, width is changed again when in submenu and less than 600px */
 @media screen and (max-width: 1000px) {
     .topnav a.active::before,
@@ -398,3 +509,156 @@ body {
     padding-top: 20px;
 }
 
+/* ----------------- Image Grid ----------------- */
+.home-MainPageContent {
+    padding-left: 10%;
+    padding-right: 10%;
+}
+
+/* Hero Section */
+.overlay {
+    position: absolute; /* Position it absolutely within the home div */
+    top: 0; /* Align to the top */
+    left: 10%; /* Align to the left */
+    right: 10%; /* Stretch to the right */
+    bottom: -72px;
+    background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent black overlay */
+    z-index: 1; /* Ensure it’s below text but above background */
+}
+
+.home-hero-section {
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    padding: 0 2rem;
+    z-index: 2;
+}
+
+.home-hero-text {
+    position: relative;
+    z-index: 2; /* Ensure text is above overlay */
+}
+
+.home-hero-text h1 {
+    font-size: 3rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.home-hero-text p {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    color: white;
+}
+
+.home-hero-text a {
+    padding: 10px 20px;
+    background-color: #ff6600;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 1rem;
+    border-radius: 5px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.home-hero-text a:hover {
+    background-color: #e65c00;
+}
+
+/* Dark mode styles */
+.dark-mode .overlay {
+    background-color: rgba(0, 0, 0, 0.2); /* Darker overlay for better text readability */
+}
+
+.dark-mode .home-hero-section {
+    color: #d9d9d9; /* Lighter text for dark mode */
+}
+
+.dark-mode .home-hero-text h1,
+.dark-mode .home-hero-text p {
+    color: #d9d9d9;
+}
+
+.dark-mode .home-hero-text a {
+    background-color: #ff9500; /* Adjusted button color for dark mode */
+    color: #222; /* Darker text on button */
+}
+
+.dark-mode .home-hero-text a:hover {
+    background-color: #e68900; /* Slightly darker hover for dark mode */
+}
+
+/* Product Grid */
+.home-featured-products {
+    padding-left: 10%;
+    padding-right: 10%;
+}
+
+.home-product-listHome {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(250px, 1fr));
+    gap: 2rem;
+    justify-content: center; /* Centers the grid items */
+    padding: 0 2rem; /* Adds some padding on the sides */
+}
+
+.home-product {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.home-product img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.home-product:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.home-product-name {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    font-size: 1.2rem;
+    padding: 0.5rem;
+    border-radius: 5px;
+}
+
+/* Dark mode product styles */
+.dark-mode .home-product {
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .home-product:hover {
+    box-shadow: 0 8px 15px rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .home-product-name {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #d9d9d9;
+}
+
+.home-product a {
+    display: block;
+    position: relative;
+}
+
+.home-product a:hover .home-product-name {
+    background-color: rgba(255, 255, 255, 0.3); /* Dark mode hover effect */
+}

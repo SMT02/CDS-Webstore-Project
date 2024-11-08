@@ -13,6 +13,7 @@ function Sofas() {
     }, []);
 
     return (
+        <div className="MainPageContent">
         <div className="product-list">
             {sofas.map((sofa) => (
                 <div key={sofa.id} className="product">
@@ -25,7 +26,11 @@ function Sofas() {
                 </div>
             ))}
         </div>
+        </div>
     );
 }
 
 export default Sofas;
+
+
+

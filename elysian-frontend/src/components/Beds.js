@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ky from 'ky';
 
+
 function Beds() {
     const [beds, setBeds] = useState([]);
+
 
     useEffect(() => {
         ky.get('http://localhost:5000/api/products', { searchParams: { category: 'bed' } })
@@ -12,7 +14,9 @@ function Beds() {
             .catch((error) => console.error('Error fetching beds:', error));
     }, []);
 
+
     return (
+        <div className="MainPageContent">
         <div className="product-list">
             {beds.map((bed) => (
                 <div key={bed.id} className="product">
@@ -25,7 +29,13 @@ function Beds() {
                 </div>
             ))}
         </div>
+        </div>
     );
 }
 
+
 export default Beds;
+
+
+
+

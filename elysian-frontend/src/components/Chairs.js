@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ky from 'ky';
 
+
 function Chairs() {
     const [chairs, setChairs] = useState([]);
+
 
     useEffect(() => {
         ky.get('http://localhost:5000/api/products', { searchParams: { category: 'chair' } })
@@ -12,7 +14,9 @@ function Chairs() {
             .catch((error) => console.error('Error fetching chairs:', error));
     }, []);
 
+
     return (
+        <div className="MainPageContent">
         <div className="product-list">
             {chairs.map((chair) => (
                 <div key={chair.id} className="product">
@@ -25,7 +29,13 @@ function Chairs() {
                 </div>
             ))}
         </div>
+        </div>
     );
 }
 
+
 export default Chairs;
+
+
+
+
