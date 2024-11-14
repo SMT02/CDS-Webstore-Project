@@ -17,6 +17,7 @@ import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext'; // Import WishlistProvider
 import { ThemeProvider } from './context/ThemeContext'; // Import ThemeProvider
 import Checkout from './components/Checkout';
+import VendorApplication from './components/VendorApplication'; // Import VendorApplication
 
 function App() {
     return (
@@ -38,6 +39,7 @@ function App() {
                                     <Route path="/wishlist" element={<Wishlist />} />
                                     <Route path="/product/:id" element={<ProductDetail />} />
                                     <Route path="/checkout" element={<Checkout />} />
+                                    <Route path="/vendor-application" element={<VendorApplication />} /> {/* VendorApplication Route */}
                                 </Routes>
                             </div>
                             <Footer />

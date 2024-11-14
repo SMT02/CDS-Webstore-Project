@@ -23,9 +23,10 @@ app.use(session({
 // Create MySQL connection
 const db = mysql.createConnection({
     host: 'localhost',
+    port: 3306,
     user: 'root',  // Replace with your MySQL username
     password: 'Adsfjlk;122',  // Replace with your MySQL password
-    database: 'elysiantest'  // Your database name
+    database: 'elysiantest',  // Your database name
 });
 
 db.connect(err => {
@@ -302,6 +303,39 @@ app.delete('/api/wishlist/:id', (req, res) => {
     });
 });
 
+// Get reviews for a product
+app.get('/reviews/:productId', (req, res) => {
+    const productId = req.params.productId;
+    const query = 'SELECT * FROM reviews WHERE product_id = ? ORDER BY created_at DESC';
+    
+    db.query(query, [productId], (err, results) => {
+        if (err) {
+            console.error('Error fetching reviews:', err);
+            return res.status(500).json({ error: 'Failed to fetch reviews' });
+        }
+        res.json(results);
+    });
+});
+
+// Add a review for a product
+app.post('/reviews/:productId', (req, res) => {
+    const productId = req.params.productId;
+    const { rating, comment } = req.body;
+
+    if (!rating || rating < 1 || rating > 5) {
+        return res.status(400).json({ error: 'Invalid rating value' });
+    }
+
+    const query = 'INSERT INTO reviews (product_id, rating, comment) VALUES (?, ?, ?)';
+    
+    db.query(query, [productId, rating, comment], (err, result) => {
+        if (err) {
+            console.error('Error saving review:', err);
+            return res.status(500).json({ error: 'Failed to save review' });
+        }
+        res.status(201).json({ success: true, reviewId: result.insertId });
+    });
+});
 
 // Start server
 const PORT = 5000;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ky from 'ky';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; // Import Link for the vendor link
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import styles from './AuthForm.module.css';
@@ -86,6 +86,10 @@ function Account() {
                         <button onClick={toggleForm} className={styles["toggle-button"]}>
                             {isLogin ? 'Sign Up' : 'Login'}
                         </button>
+                    </p>
+                    {/* Vendor link added below */}
+                    <p className={styles["vendor-link"]}>
+                        Are you a Vendor? <Link to="/vendor-application">Apply here</Link>
                     </p>
                 </>
             )}

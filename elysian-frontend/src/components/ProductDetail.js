@@ -12,9 +12,13 @@ function ProductDetail() {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
-    const [showMessage, setShowMessage] = useState(false);  // State to control the popup message visibility
+    const [showMessage, setShowMessage] = useState(false);
+    const [rating, setRating] = useState(0); // User's rating
+    const [hoverRating, setHoverRating] = useState(0); // Rating on hover
+    const [comment, setComment] = useState('');
+    const [reviews, setReviews] = useState([]);
 
-
+    // Fetch product details
     useEffect(() => {
         ky.get(`http://localhost:5000/api/products/${id}`)
             .json()
@@ -28,13 +32,65 @@ function ProductDetail() {
             });
     }, [id]);
 
+    // Fetch reviews for this product
+    useEffect(() => {
+        ky.get(`http://localhost:5000/reviews/${id}`)
+            .json()
+            .then((data) => setReviews(data))
+            .catch((error) => console.error('Error fetching reviews:', error));
+    }, [id]);
+
+    // Handler for submitting a review
+    const handleReviewSubmit = (e) => {
+        e.preventDefault();
+        if (rating === 0 || comment === '') return;
+
+        const newReview = {
+            rating,
+            comment,
+        };
+
+        // POST request to submit the review
+        ky.post(`http://localhost:5000/reviews/${id}`, {
+            json: newReview,
+        })
+            .json()
+            .then((response) => {
+                setReviews([...reviews, { ...newReview, date: new Date().toLocaleDateString() }]);
+                setRating(0);
+                setComment('');
+            })
+            .catch((error) => {
+                console.error('Error submitting review:', error);
+            });
+    };
+
+    // Function to render the star rating system
+    const renderStars = () => {
+        return (
+            <div className="star-rating">
+                {[1, 2, 3, 4, 5].map((star) => (
+                    <span
+                        key={star}
+                        className={star <= (hoverRating || rating) ? 'star filled' : 'star'}
+                        onClick={() => setRating(star)}
+                        onMouseEnter={() => setHoverRating(star)}
+                        onMouseLeave={() => setHoverRating(0)}
+                    >
+                        ★
+                    </span>
+                ))}
+            </div>
+        );
+    };
+
     if (loading) return <div>Loading...</div>;
     if (!product) return <div>Product not found</div>;
 
     const handleAddToCart = () => {
         addToCart(product);
-        setShowMessage(true); // Show the popup message
-        setTimeout(() => setShowMessage(false), 2000); // Hide the message after 2 seconds
+        setShowMessage(true);
+        setTimeout(() => setShowMessage(false), 2000);
     };
 
     const handleAddToWishlist = () => {
@@ -50,9 +106,9 @@ function ProductDetail() {
                     className="product-detail-image"
                 />
             </div>
-                <div className="product-info">
-                    <h2 className="product-name">{product.name}</h2>
-                    <p className="product-brand">Brand: {product.make}</p>
+            <div className="product-info">
+                <h2 className="product-name">{product.name}</h2>
+                <p className="product-brand">Brand: {product.make}</p>
                 <div className="product-meta">
                     <p className="product-price">${parseFloat(product.price || 0).toFixed(2)}</p>
                 </div>
@@ -77,17 +133,46 @@ function ProductDetail() {
                         <img src="/img/Wishlist2.png" alt="Add to Wishlist" />
                     </button>
                 </div>
-                {/* Popup message when an item is added to the cart */}
-            {showMessage && (
-                <div className="added-to-cart-message">
-                    <p>Item added to cart!</p>
+
+                {showMessage && (
+                    <div className="added-to-cart-message">
+                        <p>Item added to cart!</p>
+                    </div>
+                )}
+
+                {/* Review Form - Star Rating & Comments */}
+                <div className="review-form">
+                    <h3>Leave a Review</h3>
+                    {renderStars()}
+                    <textarea
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        placeholder="Write your comment here"
+                        className="review-comment-input"
+                    />
+                    <button onClick={handleReviewSubmit} className="submit-review-btn">Submit Review</button>
                 </div>
-            )}
+
+                {/* Customer Reviews Section */}
+                <div className="reviews-section">
+                    <h3>Customer Reviews</h3>
+                    {reviews.length > 0 ? (
+                        reviews.map((review, index) => (
+                            <div key={index} className="review">
+                                <div className="review-rating">
+                                    {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
+                                </div>
+                                <p className="review-comment">{review.comment}</p>
+                                <p className="review-date">{review.date}</p>
+                            </div>
+                        ))
+                    ) : (
+                        <p>No reviews yet. Be the first to review!</p>
+                    )}
+                </div>
             </div>
         </div>
     );
 }
 
 export default ProductDetail;
-
-

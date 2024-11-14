@@ -163,5 +163,75 @@
     background-color: #505050;
 }
 
+/* Star rating styles */
+.star-rating {
+    display: flex;
+    cursor: pointer;
+    font-size: 2rem; /* Size of the stars */
+    margin-bottom: 1rem; /* Space below the star rating */
+}
 
+.star {
+    color: #ccc; /* Default color for empty stars */
+    margin-right: 5px;
+    transition: color 0.3s ease;
+}
 
+.star.filled {
+    color: #ffb400; /* Gold color for filled stars */
+}
+
+/* Review form styles */
+.review-form {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.review-comment-input {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 100px;
+}
+
+.submit-review-btn {
+    padding: 10px 20px;
+    background-color: gray;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    align-self: start;
+}
+
+.submit-review-btn:hover {
+    background-color: #505050;
+}
+
+/* Review display styles */
+.review {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.review-rating {
+    font-size: 1.5rem;
+    color: #ffb400; /* Gold color for star rating display */
+}
+
+.review-comment {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    color: #333;
+}
+
+.review-date {
+    font-size: 0.875rem;
+    color: #888;
+    margin-top: 0.2rem;
+}

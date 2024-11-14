@@ -1,0 +1,86 @@
+/* General container styling */
+.vendor-form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 600px;
+    background-color: #f9f9f9; /* Light background */
+    border: 1px solid #ddd; /* Subtle border */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Slight shadow */
+}
+
+/* Title styling */
+.vendor-form-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333; /* Dark text for readability */
+    text-align: center;
+}
+
+/* Form input styling */
+.vendor-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 5px; /* Slightly rounded corners */
+    box-sizing: border-box; /* Ensure consistent padding and width */
+    outline: none; /* Remove outline on focus */
+}
+
+.vendor-input:focus {
+    border-color: #007bff; /* Highlight border when focused */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Slight glow effect */
+}
+
+/* Button styling */
+.vendor-button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff; /* White text */
+    background-color: #007bff; /* Blue button background */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.vendor-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Message styling */
+.vendor-message {
+    margin-top: 15px;
+    font-size: 16px;
+    text-align: center;
+    color: green; /* Success message color */
+}
+
+.vendor-message.error {
+    color: red; /* Error message color */
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .vendor-form-container {
+        padding: 15px;
+        width: 90%;
+    }
+
+    .vendor-input, .vendor-button {
+        font-size: 14px;
+    }
+
+    .vendor-form-title {
+        font-size: 20px;
+    }
+}
