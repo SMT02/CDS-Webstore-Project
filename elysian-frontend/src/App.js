@@ -18,6 +18,9 @@ import { WishlistProvider } from './context/WishlistContext'; // Import Wishlist
 import { ThemeProvider } from './context/ThemeContext'; // Import ThemeProvider
 import Checkout from './components/Checkout';
 import VendorApplication from './components/VendorApplication'; // Import VendorApplication
+import VendorDashboard from './components/VendorDashboard';
+import VendorLogin from './components/VendorLogin';
+import VendorProduct from './components/VendorProduct'; // Import VendorProduct
 
 function App() {
     return (
@@ -39,7 +42,10 @@ function App() {
                                     <Route path="/wishlist" element={<Wishlist />} />
                                     <Route path="/product/:id" element={<ProductDetail />} />
                                     <Route path="/checkout" element={<Checkout />} />
+                                    <Route path="/vendor/login" element={<VendorLogin />} />
                                     <Route path="/vendor-signup" element={<VendorApplication />} /> {/* Correct Route */}
+                                    <Route path="/vendor-dashboard" element={<VendorDashboard />} />
+                                    <Route path="/vendor-product/:id" element={<VendorProduct />} /> {/* New Route */}
                                 </Routes>
                             </div>
                             <Footer />

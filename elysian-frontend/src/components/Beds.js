@@ -24,21 +24,43 @@ function Beds() {
                 {beds.map((bed) => (
                     <div key={bed.id} className="product">
                         <Link to={`/product/${bed.id}`}>
-                            <img src={bed.image} alt={bed.name} />
+                            <div className="product-image-container">
+                                <img 
+                                    src={bed.image_path ? `http://localhost:5000/${bed.image_path}` : bed.image}
+                                    alt={bed.name}
+                                    className="product-image"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = '/placeholder-image.jpg';
+                                    }}
+                                />
+                            </div>
                         </Link>
                         <p className="productName">{bed.name}</p>
                         <p>Brand: {bed.make}</p>
-                        <p>Price: ${bed.price}</p>
+                        <p>Price: ${parseFloat(bed.price).toFixed(2)}</p>
+                        <p>{bed.description}</p>
                     </div>
                 ))}
                 {vendorBeds.map((vendorBed) => (
                     <div key={vendorBed.id} className="product">
                         <Link to={`/vendor-product/${vendorBed.id}`}>
-                            <img src={vendorBed.image_path} alt={vendorBed.name} />
+                            <div className="product-image-container">
+                                <img 
+                                    src={`http://localhost:5000/${vendorBed.image_path}`}
+                                    alt={vendorBed.name}
+                                    className="product-image"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = '/placeholder-image.jpg';
+                                    }}
+                                />
+                            </div>
                         </Link>
                         <p className="productName">{vendorBed.name}</p>
                         <p>Brand: {vendorBed.make}</p>
-                        <p>Price: ${vendorBed.price}</p>
+                        <p>Price: ${parseFloat(vendorBed.price).toFixed(2)}</p>
+                        <p>{vendorBed.description}</p>
                     </div>
                 ))}
             </div>

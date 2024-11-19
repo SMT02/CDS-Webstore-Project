@@ -6,21 +6,72 @@ const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
 const session = require('express-session'); // For session management
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' }); // Destination for uploaded files
+const fs = require('fs');
+const path = require('path');
+
+// Ensure uploads directory exists
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Update the storage configuration
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + '-' + file.originalname);
+    }
+});
+
+const upload = multer({ 
+    storage: storage,
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg') {
+            cb(null, true);
+        } else {
+            cb(new Error('Only .jpg files are allowed'));
+        }
+    }
+}).single('image'); // Configure for single file upload named 'image'
 
 const app = express();
-app.use(cors({ origin: 'http://localhost:3000', credentials: true })); // Allow cookies from frontend
-app.use(bodyParser.json());
-app.use(cookieParser());
 
-// Configure session middleware
-app.use(session({
-    secret: 'your_secret_key_here',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true, sameSite: 'strict' }
+// Update body parser configuration
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
+// Update CORS configuration
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Vendor-ID'],
 }));
 
+// Ensure that cookieParser is used before express-session
+app.use(cookieParser());
+
+// Simplified session
+app.use(session({
+    secret: 'your_secret_key_here',
+    resave: true,
+    saveUninitialized: true,
+    cookie: { secure: false }
+}));
+
+// Simplified vendor auth check
+const checkVendorAuth = (req, res, next) => {
+    if (!req.session.vendorId) {
+        return res.status(401).json({ error: 'Not authenticated' });
+    }
+    next();
+};
+
+// Serve static files from the 'uploads' directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Create MySQL connection
 const db = mysql.createConnection({
@@ -132,7 +183,6 @@ app.post('/api/login', (req, res) => {
     });
 });
 
-
 // Route to add item to cart (POST /api/cart)
 app.post('/api/cart', (req, res) => {
     const { product_id, quantity } = req.body;
@@ -160,7 +210,6 @@ app.post('/api/cart', (req, res) => {
     });
 });
 
-
 // Route to get cart items (GET /api/cart)
 app.get('/api/cart', (req, res) => {
     const userId = req.session.userId; // Assume user is logged in with session
@@ -187,7 +236,6 @@ app.get('/api/cart', (req, res) => {
     });
 });
 
-
 // Route to clear cart items (DELETE /api/cart)
 app.delete('/api/cart', (req, res) => {
     const userId = req.session.userId || null;
@@ -197,7 +245,7 @@ app.delete('/api/cart', (req, res) => {
         return res.status(401).json({ error: 'User not logged in or session not available' });
     }
 
-    const query = `DELETE FROM cart_items WHERE user_id = ? OR session_id = ?`;
+    const query = 'DELETE FROM cart_items WHERE user_id = ? OR session_id = ?';
     const params = [userId, sessionId];
 
     db.query(query, params, (err) => {
@@ -228,6 +276,7 @@ app.get('/api/check-session', (req, res) => {
         res.json({ isAuthenticated: false });
     }
 });
+
 // Route to add item to wishlist (POST /api/wishlist)
 app.post('/api/wishlist', (req, res) => {
     const { product_id } = req.body;
@@ -289,7 +338,7 @@ app.delete('/api/wishlist/:id', (req, res) => {
         return res.status(401).json({ error: 'User not logged in' });
     }
 
-    const query = `DELETE FROM wishlist_items WHERE user_id = ? AND product_id = ?`;
+    const query = 'DELETE FROM wishlist_items WHERE user_id = ? AND product_id = ?';
     const params = [userId, productId];
 
     db.query(query, params, (err) => {
@@ -320,7 +369,6 @@ app.get('/reviews/:productId', (req, res) => {
         res.json(results);
     });
 });
-
 
 // Add a review for a product
 app.post('/reviews/:productId', (req, res) => {
@@ -380,26 +428,29 @@ app.post('/api/vendor/signup', async (req, res) => {
     }
 });
 
+// Update vendor login route
 app.post('/api/vendor/login', (req, res) => {
     const { email, password } = req.body;
-
+    
     const query = 'SELECT * FROM vendors WHERE email = ?';
     db.query(query, [email], async (err, results) => {
         if (err) return res.status(500).json({ error: 'Database error' });
-        if (results.length === 0) return res.status(401).json({ error: 'Invalid email or password' });
+        if (results.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
 
         const vendor = results[0];
         const match = await bcrypt.compare(password, vendor.password);
         if (match) {
             req.session.vendorId = vendor.id;
             req.session.vendorName = vendor.full_name;
-            res.status(200).json({ message: 'Login successful', vendorName: vendor.full_name });
+            console.log('Vendor logged in, session data:', req.session);
+            res.status(200).json({
+                message: 'Login successful'
+            });
         } else {
-            res.status(401).json({ error: 'Invalid email or password' });
+            res.status(401).json({ error: 'Invalid credentials' });
         }
     });
 });
-
 
 app.put('/api/vendor/:id/status', (req, res) => {
     const { id } = req.params;
@@ -436,64 +487,210 @@ app.get('/api/vendor/:id/products', (req, res) => {
     });
 });
 
-const query = `
-    SELECT r.id, r.product_id, r.user_id, r.rating, r.comment, r.created_at, u.email AS userEmail
-    FROM reviews r
-    JOIN users u ON r.user_id = u.id
-    WHERE r.product_id = ?
-    ORDER BY r.created_at DESC
-`;
-
-
-
-
-app.post('/api/vendor/products', upload.array('images', 10), (req, res) => {
-    const vendorId = req.session.vendorId;
-    const products = JSON.parse(req.body.products);
-
-    if (!vendorId) return res.status(401).json({ error: 'Vendor not logged in' });
-
-    const values = products.map(product => [
-        vendorId,
-        product.name,
-        product.price || 0.0,
-        product.imagePath || '', // Image paths saved during upload
-        product.category,
-        product.make || '',
-        product.description || ''
-    ]);
-
-    const query = `
-        INSERT INTO vendor_products (vendor_id, name, price, image_path, category, make, description)
-        VALUES ?
-    `;
-
-    db.query(query, [values], (err) => {
-        if (err) {
-            console.error('Database error:', err);
-            return res.status(500).json({ error: 'Database error' });
+// Update product upload route with better error handling and file path management
+app.post('/api/vendor/products', checkVendorAuth, (req, res) => {
+    upload(req, res, function(err) {
+        if (err instanceof multer.MulterError) {
+            console.error('Multer error:', err);
+            return res.status(400).json({ error: 'File upload error' });
+        } else if (err) {
+            console.error('Other upload error:', err);
+            return res.status(500).json({ error: 'Server error during upload' });
         }
-        res.status(201).json({ message: 'Products added successfully' });
+
+        console.log('Request body:', req.body);
+        console.log('Request file:', req.file);
+
+        if (!req.file) {
+            return res.status(400).json({ error: 'No image file provided' });
+        }
+
+        const vendorId = req.session.vendorId;
+        const { name, price, category, description, make, brand } = req.body;
+
+        if (!name || !price || !category || !description || !make || !brand) {
+            // Clean up uploaded file if validation fails
+            fs.unlink(req.file.path, (unlinkErr) => {
+                if (unlinkErr) console.error('Error removing invalid upload:', unlinkErr);
+            });
+            return res.status(400).json({ error: 'All fields are required' });
+        }
+
+        const query = `
+            INSERT INTO vendor_products (vendor_id, name, price, category, description, image_path, make, brand)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        const imagePath = 'uploads/' + req.file.filename;
+
+        db.query(query, [
+            vendorId,
+            name,
+            parseFloat(price),
+            category,
+            description,
+            imagePath,
+            make,
+            brand
+        ], (dbErr, result) => {
+            if (dbErr) {
+                console.error('Database error:', dbErr);
+                // Clean up uploaded file if database insert fails
+                fs.unlink(req.file.path, (unlinkErr) => {
+                    if (unlinkErr) console.error('Error removing failed upload:', unlinkErr);
+                });
+                return res.status(500).json({ error: 'Failed to add product to database' });
+            }
+
+            res.status(201).json({
+                message: 'Product added successfully',
+                newProduct: {
+                    id: result.insertId,
+                    name,
+                    price,
+                    category,
+                    description,
+                    image_path: imagePath,
+                    make,
+                    brand
+                }
+            });
+        });
     });
 });
-app.get('/api/vendor/dashboard', (req, res) => {
-    const vendorId = req.session.vendorId;
 
-    if (!vendorId) return res.status(401).json({ error: 'Vendor not logged in' });
-
+// Simplified dashboard route
+app.get('/api/vendor/dashboard', checkVendorAuth, (req, res) => {
     const query = 'SELECT * FROM vendor_products WHERE vendor_id = ?';
-    db.query(query, [vendorId], (err, results) => {
+    db.query(query, [req.session.vendorId], (err, results) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ error: 'Failed to fetch products' });
+        }
+        res.json(results);
+    });
+});
+
+app.delete('/api/vendor/products/:id', (req, res) => {
+    const vendorId = req.session.vendorId;
+    const productId = req.params.id;
+
+    if (!vendorId) {
+        return res.status(401).json({ error: 'Vendor not logged in' });
+    }
+
+    const query = 'DELETE FROM vendor_products WHERE id = ? AND vendor_id = ?';
+    db.query(query, [productId, vendorId], (err, result) => {
+        if (err) {
+            console.error('Error deleting product:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Product not found or not owned by this vendor' });
+        }
+        res.status(200).json({ message: 'Product deleted successfully' });
+    });
+});
+
+// Add vendor session check route
+app.get('/api/vendor/check-session', (req, res) => {
+    if (req.session.vendorId) {
+        res.json({
+            isVendor: true,
+            vendorId: req.session.vendorId,
+            vendorName: req.session.vendorName
+        });
+    } else {
+        res.json({ isVendor: false });
+    }
+});
+
+// Update vendor logout route to be more robust
+app.post('/api/vendor/logout', (req, res) => {
+    if (req.session) {
+        // Clear vendor-specific session data
+        delete req.session.vendorId;
+        delete req.session.vendorName;
+        
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('Error during logout:', err);
+                return res.status(500).json({ error: 'Logout failed' });
+            }
+            
+            // Clear the session cookie
+            res.clearCookie('connect.sid', {
+                path: '/',
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict'
+            });
+            
+            res.status(200).json({ message: 'Logged out successfully' });
+        });
+    } else {
+        res.status(200).json({ message: 'Already logged out' });
+    }
+});
+
+// Modify the vendor products route to include more details
+app.get('/api/vendor-products/:id', (req, res) => {
+    const productId = req.params.id;
+    const query = `
+        SELECT 
+            vp.*,
+            v.business_name as vendor_name,
+            v.id as vendor_id,
+            v.email as vendor_email
+        FROM vendor_products vp
+        JOIN vendors v ON vp.vendor_id = v.id
+        WHERE vp.id = ?
+    `;
+    
+    db.query(query, [productId], (err, results) => {
         if (err) {
             console.error('Database error:', err);
             return res.status(500).json({ error: 'Database error' });
         }
-        res.status(200).json(results);
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+        
+        const product = results[0];
+        // Ensure the image path is properly formatted
+        if (product.image_path && !product.image_path.startsWith('http')) {
+            product.image_path = `uploads/${product.image_path.split('uploads/').pop()}`;
+        }
+        
+        res.json(product);
     });
 });
 
+// Add a route to get all vendor products by category
+app.get('/api/vendor-products', (req, res) => {
+    const category = req.query.category;
+    const query = category 
+        ? 'SELECT * FROM vendor_products WHERE category = ?' 
+        : 'SELECT * FROM vendor_products';
+    const params = category ? [category] : [];
+
+    db.query(query, params, (err, results) => {
+        if (err) {
+            console.error('Error fetching vendor products:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        // Format image paths for all products
+        const formattedResults = results.map(product => ({
+            ...product,
+            image_path: product.image_path ? `uploads/${product.image_path.split('uploads/').pop()}` : null
+        }));
+        res.json(formattedResults);
+    });
+});
 
 // Start server
 const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
 });
+

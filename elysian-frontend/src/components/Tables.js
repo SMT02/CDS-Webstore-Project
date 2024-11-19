@@ -24,21 +24,43 @@ function Tables() {
                 {tables.map((table) => (
                     <div key={table.id} className="product">
                         <Link to={`/product/${table.id}`}>
-                            <img src={table.image} alt={table.name} />
+                            <div className="product-image-container">
+                                <img 
+                                    src={table.image_path ? `http://localhost:5000/${table.image_path}` : table.image}
+                                    alt={table.name}
+                                    className="product-image"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = '/placeholder-image.jpg';
+                                    }}
+                                />
+                            </div>
                         </Link>
                         <p className="productName">{table.name}</p>
                         <p>Brand: {table.make}</p>
                         <p>Price: ${table.price}</p>
+                        <p>{table.description}</p>
                     </div>
                 ))}
                 {vendorTables.map((vendorTable) => (
                     <div key={vendorTable.id} className="product">
                         <Link to={`/vendor-product/${vendorTable.id}`}>
-                            <img src={vendorTable.image_path} alt={vendorTable.name} />
+                            <div className="product-image-container">
+                                <img 
+                                    src={`http://localhost:5000/${vendorTable.image_path}`}
+                                    alt={vendorTable.name}
+                                    className="product-image"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = '/placeholder-image.jpg';
+                                    }}
+                                />
+                            </div>
                         </Link>
                         <p className="productName">{vendorTable.name}</p>
                         <p>Brand: {vendorTable.make}</p>
-                        <p>Price: ${vendorTable.price}</p>
+                        <p>Price: ${parseFloat(vendorTable.price).toFixed(2)}</p>
+                        <p>{vendorTable.description}</p>
                     </div>
                 ))}
             </div>

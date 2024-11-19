@@ -18,7 +18,7 @@ function ProductDetail() {
     const [comment, setComment] = useState('');
     const [reviews, setReviews] = useState([]);
     const [averageRating, setAverageRating] = useState(0);
-    const [reviewsLoading, setReviewsLoading] = useState(true); // New state for loading reviews
+    const [reviewsLoading, setReviewsLoading] = useState(true);
 
     // Fetch product details
     useEffect(() => {
@@ -40,8 +40,8 @@ function ProductDetail() {
         ky.get(`http://localhost:5000/reviews/${id}`, { credentials: 'include' })
             .json()
             .then((data) => {
-                setReviews(data); // Set reviews fetched from the backend
-                calculateAverageRating(data); // Recalculate the average rating
+                setReviews(data);
+                calculateAverageRating(data);
                 setReviewsLoading(false);
             })
             .catch((error) => {
@@ -67,8 +67,8 @@ function ProductDetail() {
 
         try {
             const response = await ky.post(`http://localhost:5000/reviews/${id}`, {
-                json: { rating, comment }, // Send rating and comment to the backend
-                credentials: 'include', // Include session cookie
+                json: { rating, comment },
+                credentials: 'include',
             });
 
             const newReview = await response.json();

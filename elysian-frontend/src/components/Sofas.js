@@ -24,21 +24,43 @@ function Sofas() {
                 {sofas.map((sofa) => (
                     <div key={sofa.id} className="product">
                         <Link to={`/product/${sofa.id}`}>
-                            <img src={sofa.image} alt={sofa.name} />
+                            <div className="product-image-container">
+                                <img 
+                                    src={sofa.image_path ? `http://localhost:5000/${sofa.image_path}` : sofa.image}
+                                    alt={sofa.name}
+                                    className="product-image"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = '/placeholder-image.jpg';
+                                    }}
+                                />
+                            </div>
                         </Link>
                         <p className="productName">{sofa.name}</p>
                         <p>Brand: {sofa.make}</p>
                         <p>Price: ${sofa.price}</p>
+                        <p>{sofa.description}</p>
                     </div>
                 ))}
                 {vendorSofas.map((vendorSofa) => (
                     <div key={vendorSofa.id} className="product">
                         <Link to={`/vendor-product/${vendorSofa.id}`}>
-                            <img src={vendorSofa.image_path} alt={vendorSofa.name} />
+                            <div className="product-image-container">
+                                <img 
+                                    src={`http://localhost:5000/${vendorSofa.image_path}`}
+                                    alt={vendorSofa.name}
+                                    className="product-image"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = '/placeholder-image.jpg';
+                                    }}
+                                />
+                            </div>
                         </Link>
                         <p className="productName">{vendorSofa.name}</p>
                         <p>Brand: {vendorSofa.make}</p>
-                        <p>Price: ${vendorSofa.price}</p>
+                        <p>Price: ${parseFloat(vendorSofa.price).toFixed(2)}</p>
+                        <p>{vendorSofa.description}</p>
                     </div>
                 ))}
             </div>

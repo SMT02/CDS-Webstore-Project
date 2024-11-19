@@ -13,64 +13,63 @@ export function AuthProvider({ children }) {
     const [vendorName, setVendorName] = useState('');
 
     useEffect(() => {
-        const savedLoginStatus = localStorage.getItem('isLoggedIn') === 'true';
-        const savedVendorLoginStatus = localStorage.getItem('isVendorLoggedIn') === 'true';
-
-        // Check session status with Ky
-        const checkSession = async () => {
+        // Check both customer and vendor sessions on component mount
+        const checkSessions = async () => {
             try {
-                const response = await ky.get('http://localhost:5000/api/check-session', { credentials: 'include' }).json();
-                if (response.isAuthenticated) {
+                // Check customer session
+                const userResponse = await ky.get('http://localhost:5000/api/check-session', {
+                    credentials: 'include'
+                }).json();
+                
+                if (userResponse.isAuthenticated) {
                     setIsLoggedIn(true);
-                    localStorage.setItem('isLoggedIn', 'true');
-                } else {
-                    setIsLoggedIn(savedLoginStatus);
                 }
-            } catch (error) {
-                console.error('Error checking user session:', error);
-                setIsLoggedIn(false);
-            }
 
-            // Check vendor session
-            try {
-                const vendorResponse = await ky.get('http://localhost:5000/api/vendor/dashboard', { credentials: 'include' }).json();
-                if (vendorResponse) {
+                // Check vendor session
+                const vendorResponse = await ky.get('http://localhost:5000/api/vendor/check-session', {
+                    credentials: 'include'
+                }).json();
+                
+                if (vendorResponse.isVendor) {
                     setIsVendorLoggedIn(true);
                     setVendorName(vendorResponse.vendorName || '');
-                    localStorage.setItem('isVendorLoggedIn', 'true');
-                } else {
-                    setIsVendorLoggedIn(savedVendorLoginStatus);
                 }
             } catch (error) {
-                console.error('Error checking vendor session:', error);
+                console.error('Error checking sessions:', error);
+                // Reset states on error
+                setIsLoggedIn(false);
                 setIsVendorLoggedIn(false);
+                setVendorName('');
             }
         };
 
-        checkSession();
-    }, []);
+        checkSessions();
+    }, []); // Empty dependency array means this runs once on mount
 
     const logIn = () => {
         setIsLoggedIn(true);
         localStorage.setItem('isLoggedIn', 'true');
     };
 
-    const vendorLogIn = (vendorName) => {
+    const vendorLogIn = (name) => {
         setIsVendorLoggedIn(true);
-        setVendorName(vendorName);
-        localStorage.setItem('isVendorLoggedIn', 'true');
+        setVendorName(name);
     };
 
     const logOut = async () => {
         try {
+            // Attempt to logout from both customer and vendor sessions
             await ky.post('http://localhost:5000/api/logout', { credentials: 'include' });
+            await ky.post('http://localhost:5000/api/vendor/logout', { credentials: 'include' });
+        } catch (error) {
+            console.error('Error during logout:', error);
+        } finally {
+            // Reset all auth states regardless of logout API success
             setIsLoggedIn(false);
             setIsVendorLoggedIn(false);
             setVendorName('');
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('isVendorLoggedIn');
-        } catch (error) {
-            console.error('Error during logout:', error);
         }
     };
 
@@ -85,7 +84,7 @@ export function AuthProvider({ children }) {
                 isVendorLoggedIn,
                 vendorName,
                 logIn,
-                vendorLogIn,
+                vendorLogIn, // Make sure this is exposed
                 logOut,
                 isAuthenticated,
                 isVendorAuthenticated,

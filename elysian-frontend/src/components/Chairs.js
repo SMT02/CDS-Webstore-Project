@@ -24,21 +24,43 @@ function Chairs() {
                 {chairs.map((chair) => (
                     <div key={chair.id} className="product">
                         <Link to={`/product/${chair.id}`}>
-                            <img src={chair.image} alt={chair.name} />
+                            <div className="product-image-container">
+                                <img 
+                                    src={chair.image_path ? `http://localhost:5000/${chair.image_path}` : chair.image}
+                                    alt={chair.name}
+                                    className="product-image"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = '/placeholder-image.jpg';
+                                    }}
+                                />
+                            </div>
                         </Link>
                         <p className="productName">{chair.name}</p>
                         <p>Brand: {chair.make}</p>
                         <p>Price: ${chair.price}</p>
+                        <p>{chair.description}</p>
                     </div>
                 ))}
                 {vendorChairs.map((vendorChair) => (
                     <div key={vendorChair.id} className="product">
                         <Link to={`/vendor-product/${vendorChair.id}`}>
-                            <img src={vendorChair.image_path} alt={vendorChair.name} />
+                            <div className="product-image-container">
+                                <img 
+                                    src={`http://localhost:5000/${vendorChair.image_path}`}
+                                    alt={vendorChair.name}
+                                    className="product-image"
+                                    onError={(e) => {
+                                        e.target.onerror = null;
+                                        e.target.src = '/placeholder-image.jpg';
+                                    }}
+                                />
+                            </div>
                         </Link>
                         <p className="productName">{vendorChair.name}</p>
                         <p>Brand: {vendorChair.make}</p>
-                        <p>Price: ${vendorChair.price}</p>
+                        <p>Price: ${parseFloat(vendorChair.price).toFixed(2)}</p>
+                        <p>{vendorChair.description}</p>
                     </div>
                 ))}
             </div>

@@ -1,11 +1,14 @@
-import React, { useContext, useState } from 'react'; // Added useState here
-import { NavLink, Link } from 'react-router-dom';
+import React, { useContext, useState, useEffect } from 'react';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import '../styles.css';
 
 function Navbar() {
     const { isDarkMode, enableDarkMode, enableLightMode } = useContext(ThemeContext);
+    const { isVendorLoggedIn } = useAuth();
     const [isResponsive, setIsResponsive] = useState(false);
+    const navigate = useNavigate();
 
     // State for logo image
     const logoImage = isDarkMode ? '/img/EFDarkmode.jpg' : '/img/EF___1.jpg';
