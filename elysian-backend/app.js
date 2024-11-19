@@ -5,6 +5,8 @@ const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 const cookieParser = require('cookie-parser');
 const session = require('express-session'); // For session management
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' }); // Destination for uploaded files
 
 const app = express();
 app.use(cors({ origin: 'http://localhost:3000', credentials: true })); // Allow cookies from frontend
@@ -40,21 +42,31 @@ db.connect(err => {
 // API route to get all products, optionally filtered by category
 app.get('/api/products', (req, res) => {
     const category = req.query.category;
-    let query = 'SELECT * FROM products';
-    const params = [];
+    const productQuery = category
+        ? 'SELECT * FROM products WHERE category = ?'
+        : 'SELECT * FROM products';
+    const vendorProductQuery = category
+        ? 'SELECT * FROM vendor_products WHERE category = ?'
+        : 'SELECT * FROM vendor_products';
 
-    if (category) {
-        query += ' WHERE category = ?';
-        params.push(category);
-    }
+    const params = category ? [category] : [];
 
-    db.query(query, params, (err, results) => {
+    db.query(productQuery, params, (err, productResults) => {
         if (err) {
-            console.error('Database error:', err);
-            res.status(500).json({ error: 'Database error' });
-        } else {
-            res.json(results);
+            console.error('Error fetching products:', err);
+            return res.status(500).json({ error: 'Database error' });
         }
+
+        db.query(vendorProductQuery, params, (err, vendorProductResults) => {
+            if (err) {
+                console.error('Error fetching vendor products:', err);
+                return res.status(500).json({ error: 'Database error' });
+            }
+
+            // Combine results from both tables
+            const combinedResults = [...productResults, ...vendorProductResults];
+            res.json(combinedResults);
+        });
     });
 });
 
@@ -79,59 +91,43 @@ app.get('/api/products/:id', (req, res) => {
 app.post('/api/signup', async (req, res) => {
     const { email, password } = req.body;
 
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password are required' });
+    }
+
     try {
         const checkEmailQuery = 'SELECT * FROM users WHERE email = ?';
         db.query(checkEmailQuery, [email], async (err, results) => {
-            if (err) {
-                console.error('Database error during email check:', err);
-                res.status(500).json({ error: 'Database error' });
-                return;
-            }
-            
-            if (results.length > 0) {
-                res.status(400).json({ error: 'Email already in use' });
-                return;
-            }
-            
-            const saltRounds = 10;
-            const hashedPassword = await bcrypt.hash(password, saltRounds);
+            if (err) return res.status(500).json({ error: 'Database error' });
+            if (results.length > 0) return res.status(400).json({ error: 'Email already in use' });
 
+            const hashedPassword = await bcrypt.hash(password, 10);
             const insertUserQuery = 'INSERT INTO users (email, password) VALUES (?, ?)';
-            db.query(insertUserQuery, [email, hashedPassword], (err, result) => {
-                if (err) {
-                    console.error('Error inserting user:', err);
-                    res.status(500).json({ error: 'Database error' });
-                } else {
-                    res.status(201).json({ message: 'User registered successfully' });
-                }
+            db.query(insertUserQuery, [email, hashedPassword], (err) => {
+                if (err) return res.status(500).json({ error: 'Database error' });
+                res.status(201).json({ message: 'User registered successfully' });
             });
         });
     } catch (error) {
-        console.error('Error during registration:', error);
-        res.status(500).json({ error: 'Error during registration' });
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
-// User Login Route
 app.post('/api/login', (req, res) => {
     const { email, password } = req.body;
-    const query = 'SELECT * FROM users WHERE email = ?';
 
+    const query = 'SELECT * FROM users WHERE email = ?';
     db.query(query, [email], async (err, results) => {
-        if (err) {
-            res.status(500).json({ error: 'Database error' });
-        } else if (results.length === 0) {
-            res.status(401).json({ error: 'Invalid email or password' });
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (results.length === 0) return res.status(401).json({ error: 'Invalid email or password' });
+
+        const user = results[0];
+        const match = await bcrypt.compare(password, user.password);
+        if (match) {
+            req.session.userId = user.id;
+            res.status(200).json({ message: 'Login successful' });
         } else {
-            const user = results[0];
-            const match = await bcrypt.compare(password, user.password);
-            if (match) {
-                req.session.userId = user.id; // Save user ID in session
-                req.session.email = user.email; // Save email in session
-                res.status(200).json({ message: 'Login successful' });
-            } else {
-                res.status(401).json({ error: 'Invalid email or password' });
-            }
+            res.status(401).json({ error: 'Invalid email or password' });
         }
     });
 });
@@ -356,10 +352,144 @@ app.post('/reviews/:productId', (req, res) => {
     });
 });
 
+app.post('/api/vendor/signup', async (req, res) => {
+    const { fullName, email, password, businessName, phone } = req.body;
+
+    if (!fullName || !email || !password || !businessName || !phone) {
+        return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    try {
+        const checkEmailQuery = 'SELECT * FROM vendors WHERE email = ?';
+        db.query(checkEmailQuery, [email], async (err, results) => {
+            if (err) return res.status(500).json({ error: 'Database error' });
+            if (results.length > 0) return res.status(400).json({ error: 'Email already in use' });
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const insertVendorQuery = `
+                INSERT INTO vendors (full_name, email, password, business_name, phone)
+                VALUES (?, ?, ?, ?, ?)
+            `;
+            db.query(insertVendorQuery, [fullName, email, hashedPassword, businessName, phone], (err) => {
+                if (err) return res.status(500).json({ error: 'Database error' });
+                res.status(201).json({ message: 'Vendor registered successfully' });
+            });
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+app.post('/api/vendor/login', (req, res) => {
+    const { email, password } = req.body;
+
+    const query = 'SELECT * FROM vendors WHERE email = ?';
+    db.query(query, [email], async (err, results) => {
+        if (err) return res.status(500).json({ error: 'Database error' });
+        if (results.length === 0) return res.status(401).json({ error: 'Invalid email or password' });
+
+        const vendor = results[0];
+        const match = await bcrypt.compare(password, vendor.password);
+        if (match) {
+            req.session.vendorId = vendor.id;
+            req.session.vendorName = vendor.full_name;
+            res.status(200).json({ message: 'Login successful', vendorName: vendor.full_name });
+        } else {
+            res.status(401).json({ error: 'Invalid email or password' });
+        }
+    });
+});
+
+
+app.put('/api/vendor/:id/status', (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const validStatuses = ['approved', 'rejected'];
+    if (!validStatuses.includes(status)) {
+        return res.status(400).json({ error: 'Invalid status' });
+    }
+
+    const query = 'UPDATE vendors SET application_status = ? WHERE id = ?';
+    db.query(query, [status, id], (err, result) => {
+        if (err) {
+            console.error('Error updating vendor status:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'Vendor not found' });
+        }
+        res.status(200).json({ message: `Vendor ${status} successfully` });
+    });
+});
+
+app.get('/api/vendor/:id/products', (req, res) => {
+    const { id } = req.params;
+
+    const query = 'SELECT * FROM vendor_products WHERE vendor_id = ?';
+    db.query(query, [id], (err, results) => {
+        if (err) {
+            console.error('Error fetching vendor products:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.status(200).json(results);
+    });
+});
+
+const query = `
+    SELECT r.id, r.product_id, r.user_id, r.rating, r.comment, r.created_at, u.email AS userEmail
+    FROM reviews r
+    JOIN users u ON r.user_id = u.id
+    WHERE r.product_id = ?
+    ORDER BY r.created_at DESC
+`;
 
 
 
 
+app.post('/api/vendor/products', upload.array('images', 10), (req, res) => {
+    const vendorId = req.session.vendorId;
+    const products = JSON.parse(req.body.products);
+
+    if (!vendorId) return res.status(401).json({ error: 'Vendor not logged in' });
+
+    const values = products.map(product => [
+        vendorId,
+        product.name,
+        product.price || 0.0,
+        product.imagePath || '', // Image paths saved during upload
+        product.category,
+        product.make || '',
+        product.description || ''
+    ]);
+
+    const query = `
+        INSERT INTO vendor_products (vendor_id, name, price, image_path, category, make, description)
+        VALUES ?
+    `;
+
+    db.query(query, [values], (err) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.status(201).json({ message: 'Products added successfully' });
+    });
+});
+app.get('/api/vendor/dashboard', (req, res) => {
+    const vendorId = req.session.vendorId;
+
+    if (!vendorId) return res.status(401).json({ error: 'Vendor not logged in' });
+
+    const query = 'SELECT * FROM vendor_products WHERE vendor_id = ?';
+    db.query(query, [vendorId], (err, results) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.status(200).json(results);
+    });
+});
 
 
 // Start server

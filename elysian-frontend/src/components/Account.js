@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ky from 'ky';
-import { useNavigate, Link } from 'react-router-dom'; // Import Link for the vendor link
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import styles from './AuthForm.module.css';
@@ -49,6 +49,10 @@ function Account() {
         navigate('/');
     };
 
+    const navigateToVendorSignup = () => {
+        navigate('/vendor-signup');
+    };
+
     return (
         <div className={styles["auth-form-container"]}>
             {isLoggedIn ? (
@@ -58,7 +62,7 @@ function Account() {
                 </div>
             ) : (
                 <>
-                    <h2 className={styles["auth-form-title"]}>{isLogin ? 'Login' : 'Sign Up'}</h2>
+                    <h2 className={styles["auth-form-title"]}>{isLogin ? 'User Login' : 'User Sign Up'}</h2>
                     <form onSubmit={handleSubmit} className={styles["auth-form"]}>
                         <input
                             type="email"
@@ -87,9 +91,11 @@ function Account() {
                             {isLogin ? 'Sign Up' : 'Login'}
                         </button>
                     </p>
-                    {/* Vendor link added below */}
-                    <p className={styles["vendor-link"]}>
-                        Are you a Vendor? <Link to="/vendor-application">Apply here</Link>
+                    <p>
+                        Are you a Vendor?{' '}
+                        <button onClick={navigateToVendorSignup} className={styles["toggle-button"]}>
+                            Register as Vendor
+                        </button>
                     </p>
                 </>
             )}

@@ -24,7 +24,7 @@ function App() {
         <AuthProvider>
             <CartProvider>
                 <WishlistProvider>
-                    <ThemeProvider> {/* Wrap your app in ThemeProvider */}
+                    <ThemeProvider>
                         <Router>
                             <div className="app-container">
                                 <Navbar />
@@ -39,7 +39,7 @@ function App() {
                                     <Route path="/wishlist" element={<Wishlist />} />
                                     <Route path="/product/:id" element={<ProductDetail />} />
                                     <Route path="/checkout" element={<Checkout />} />
-                                    <Route path="/vendor-application" element={<VendorApplication />} /> {/* VendorApplication Route */}
+                                    <Route path="/vendor-signup" element={<VendorApplication />} /> {/* Correct Route */}
                                 </Routes>
                             </div>
                             <Footer />
