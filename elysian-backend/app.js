@@ -126,7 +126,8 @@ app.post('/api/login', (req, res) => {
             const user = results[0];
             const match = await bcrypt.compare(password, user.password);
             if (match) {
-                req.session.userId = user.user_id; // Set session userId
+                req.session.userId = user.id; // Save user ID in session
+                req.session.email = user.email; // Save email in session
                 res.status(200).json({ message: 'Login successful' });
             } else {
                 res.status(401).json({ error: 'Invalid email or password' });
@@ -134,6 +135,7 @@ app.post('/api/login', (req, res) => {
         }
     });
 });
+
 
 // Route to add item to cart (POST /api/cart)
 app.post('/api/cart', (req, res) => {
@@ -306,8 +308,14 @@ app.delete('/api/wishlist/:id', (req, res) => {
 // Get reviews for a product
 app.get('/reviews/:productId', (req, res) => {
     const productId = req.params.productId;
-    const query = 'SELECT * FROM reviews WHERE product_id = ? ORDER BY created_at DESC';
-    
+    const query = `
+        SELECT r.id, r.product_id, r.user_id, r.rating, r.comment, r.created_at, u.email AS userEmail
+        FROM reviews r
+        JOIN users u ON r.user_id = u.id
+        WHERE r.product_id = ?
+        ORDER BY r.created_at DESC
+    `;
+
     db.query(query, [productId], (err, results) => {
         if (err) {
             console.error('Error fetching reviews:', err);
@@ -317,25 +325,42 @@ app.get('/reviews/:productId', (req, res) => {
     });
 });
 
+
 // Add a review for a product
 app.post('/reviews/:productId', (req, res) => {
     const productId = req.params.productId;
     const { rating, comment } = req.body;
+    const userId = req.session.userId; // Get user ID from session
+
+    if (!userId) {
+        return res.status(401).json({ error: 'User not logged in' });
+    }
 
     if (!rating || rating < 1 || rating > 5) {
         return res.status(400).json({ error: 'Invalid rating value' });
     }
 
-    const query = 'INSERT INTO reviews (product_id, rating, comment) VALUES (?, ?, ?)';
-    
-    db.query(query, [productId, rating, comment], (err, result) => {
+    const query = 'INSERT INTO reviews (product_id, user_id, rating, comment) VALUES (?, ?, ?, ?)';
+
+    db.query(query, [productId, userId, rating, comment], (err, result) => {
         if (err) {
             console.error('Error saving review:', err);
             return res.status(500).json({ error: 'Failed to save review' });
         }
-        res.status(201).json({ success: true, reviewId: result.insertId });
+
+        res.status(201).json({
+            success: true,
+            reviewId: result.insertId,
+            userEmail: req.session.email, // Assuming you save the email in the session during login
+        });
     });
 });
+
+
+
+
+
+
 
 // Start server
 const PORT = 5000;

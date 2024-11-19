@@ -13,10 +13,12 @@ function ProductDetail() {
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(1);
     const [showMessage, setShowMessage] = useState(false);
-    const [rating, setRating] = useState(0); // User's rating
-    const [hoverRating, setHoverRating] = useState(0); // Rating on hover
+    const [rating, setRating] = useState(0);
+    const [hoverRating, setHoverRating] = useState(0);
     const [comment, setComment] = useState('');
     const [reviews, setReviews] = useState([]);
+    const [averageRating, setAverageRating] = useState(0);
+    const [reviewsLoading, setReviewsLoading] = useState(true); // New state for loading reviews
 
     // Fetch product details
     useEffect(() => {
@@ -32,79 +34,81 @@ function ProductDetail() {
             });
     }, [id]);
 
-    // Fetch reviews for this product
+    // Fetch reviews from backend for the specific product
     useEffect(() => {
-        ky.get(`http://localhost:5000/reviews/${id}`)
+        setReviewsLoading(true);
+        ky.get(`http://localhost:5000/reviews/${id}`, { credentials: 'include' })
             .json()
-            .then((data) => setReviews(data))
-            .catch((error) => console.error('Error fetching reviews:', error));
-    }, [id]);
-
-    // Handler for submitting a review
-    const handleReviewSubmit = (e) => {
-        e.preventDefault();
-        if (rating === 0 || comment === '') return;
-
-        const newReview = {
-            rating,
-            comment,
-        };
-
-        // POST request to submit the review
-        ky.post(`http://localhost:5000/reviews/${id}`, {
-            json: newReview,
-        })
-            .json()
-            .then((response) => {
-                setReviews([...reviews, { ...newReview, date: new Date().toLocaleDateString() }]);
-                setRating(0);
-                setComment('');
+            .then((data) => {
+                setReviews(data); // Set reviews fetched from the backend
+                calculateAverageRating(data); // Recalculate the average rating
+                setReviewsLoading(false);
             })
             .catch((error) => {
-                console.error('Error submitting review:', error);
+                console.error('Error fetching reviews:', error);
+                setReviewsLoading(false);
             });
+    }, [id]);
+
+    // Calculate the average rating
+    const calculateAverageRating = (reviewsList) => {
+        if (reviewsList.length === 0) {
+            setAverageRating(0);
+            return;
+        }
+        const avg = reviewsList.reduce((sum, review) => sum + review.rating, 0) / reviewsList.length;
+        setAverageRating(avg);
     };
 
-    // Function to render the star rating system
-    const renderStars = () => {
-        return (
-            <div className="star-rating">
-                {[1, 2, 3, 4, 5].map((star) => (
-                    <span
-                        key={star}
-                        className={star <= (hoverRating || rating) ? 'star filled' : 'star'}
-                        onClick={() => setRating(star)}
-                        onMouseEnter={() => setHoverRating(star)}
-                        onMouseLeave={() => setHoverRating(0)}
-                    >
-                        ★
-                    </span>
-                ))}
-            </div>
-        );
+    // Submit review
+    const handleReviewSubmit = async (e) => {
+        e.preventDefault();
+        if (rating === 0 || comment.trim() === '') return;
+
+        try {
+            const response = await ky.post(`http://localhost:5000/reviews/${id}`, {
+                json: { rating, comment }, // Send rating and comment to the backend
+                credentials: 'include', // Include session cookie
+            });
+
+            const newReview = await response.json();
+
+            // Add the new review to the state
+            setReviews([
+                ...reviews,
+                { ...newReview, rating, comment, date: new Date().toLocaleDateString(), userEmail: newReview.userEmail || 'Anonymous' },
+            ]);
+
+            setRating(0);
+            setComment('');
+        } catch (error) {
+            console.error('Error submitting review:', error);
+        }
     };
 
-    if (loading) return <div>Loading...</div>;
+    const renderStars = () => (
+        <div className="star-rating">
+            {[1, 2, 3, 4, 5].map((star) => (
+                <span
+                    key={star}
+                    className={star <= (hoverRating || rating) ? 'star filled' : 'star'}
+                    onClick={() => setRating(star)}
+                    onMouseEnter={() => setHoverRating(star)}
+                    onMouseLeave={() => setHoverRating(0)}
+                >
+                    ★
+                </span>
+            ))}
+        </div>
+    );
+
+    if (loading) return <div>Loading product details...</div>;
     if (!product) return <div>Product not found</div>;
-
-    const handleAddToCart = () => {
-        addToCart(product);
-        setShowMessage(true);
-        setTimeout(() => setShowMessage(false), 2000);
-    };
-
-    const handleAddToWishlist = () => {
-        addToWishlist(product);
-    };
 
     return (
         <div className="product-detail">
             <div className="product-detail-image-container">
-                <img 
-                    src={product.image} 
-                    alt={product.name} 
-                    className="product-detail-image"
-                />
+                <img src={product.image} alt={product.name} className="product-detail-image" />
             </div>
             <div className="product-info">
                 <h2 className="product-name">{product.name}</h2>
@@ -128,8 +132,10 @@ function ProductDetail() {
                             ))}
                         </select>
                     </label>
-                    <button onClick={handleAddToCart} className="add-to-cart-btn">Add to Cart</button>
-                    <button onClick={handleAddToWishlist} className="add-to-wishlist-btn">
+                    <button onClick={() => addToCart(product)} className="add-to-cart-btn">
+                        Add to Cart
+                    </button>
+                    <button onClick={() => addToWishlist(product)} className="add-to-wishlist-btn">
                         <img src="/img/Wishlist2.png" alt="Add to Wishlist" />
                     </button>
                 </div>
@@ -150,19 +156,44 @@ function ProductDetail() {
                         placeholder="Write your comment here"
                         className="review-comment-input"
                     />
-                    <button onClick={handleReviewSubmit} className="submit-review-btn">Submit Review</button>
+                    <button onClick={handleReviewSubmit} className="submit-review-btn">
+                        Submit Review
+                    </button>
                 </div>
 
                 {/* Customer Reviews Section */}
                 <div className="reviews-section">
                     <h3>Customer Reviews</h3>
-                    {reviews.length > 0 ? (
+
+                    {/* Average Rating */}
+                    {averageRating > 0 && (
+                        <div className="average-rating">
+                            <h4>Average Rating:</h4>
+                            <div className="star-rating">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <span
+                                        key={star}
+                                        className={star <= Math.round(averageRating) ? 'star filled' : 'star'}
+                                    >
+                                        ★
+                                    </span>
+                                ))}
+                            </div>
+                            <p>{averageRating.toFixed(1)} / 5</p>
+                        </div>
+                    )}
+
+                    {/* Show reviews or loading state */}
+                    {reviewsLoading ? (
+                        <p>Loading reviews...</p>
+                    ) : reviews.length > 0 ? (
                         reviews.map((review, index) => (
                             <div key={index} className="review">
                                 <div className="review-rating">
                                     {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
                                 </div>
                                 <p className="review-comment">{review.comment}</p>
+                                <p className="review-user">Reviewed by: {review.userEmail || 'Anonymous'}</p>
                                 <p className="review-date">{review.date}</p>
                             </div>
                         ))
