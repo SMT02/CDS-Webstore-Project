@@ -80,9 +80,10 @@ function Account() {
                     <h2>Welcome Back{isVendorLoggedIn ? `, ${vendorName}` : ''}!</h2>
                     {isVendorLoggedIn && (
                         <Link to="/vendor-dashboard" className={styles["dashboard-link"]}>
-                            Go to Vendor Dashboard
-                        </Link>
+                            Go to Vendor Dashboard 
+                        </Link>                       
                     )}
+                    <hr />
                     <button onClick={handleLogout} className={styles["auth-button"]}>Log Out</button>
                 </div>
             ) : (
