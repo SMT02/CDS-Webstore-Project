@@ -31,33 +31,33 @@ function Navbar() {
             <NavLink to="/beds" className="textButton">Beds</NavLink>
 
             <div className="icon-container">
-                <Link to="/account" className="icon" id="account">
+                <Link to="/account" className={`icon ${isResponsive ? 'responsive-padding' : ''}`} id="account">
                     <img src="/img/AccountIcon.png" width="24px" alt="Account" />
-                </Link>
-                <Link to="/cart" id="cart" className={`icon ${isResponsive ? 'responsive-padding' : ''}`}>
-                    <img src="/img/Cart2.png" width="27px" alt="Cart" />
                 </Link>
                 <Link to="/wishlist" id="wish" className={`icon ${isResponsive ? 'responsive-padding' : ''}`}>
                     <img src="/img/WishList2.png" width="27px" alt="Wishlist" />
                 </Link>
+                <Link to="/cart" id="cart" className={`icon ${isResponsive ? 'responsive-padding' : ''}`}>
+                    <img src="/img/Cart2.png" width="27px" alt="Cart" />
+                </Link>     
             </div>
 
             {/* Dark and Light Mode Toggle */}
-            <a href="#light-mode" id="light" className="icon" onClick={enableLightMode}>
+            <a href="#light-mode" id="light" className={`icon ${isResponsive ? 'responsive-padding' : ''}`} onClick={enableLightMode}>
                 <img src="/img/Light3.png" width="27px" alt="Light Mode" />
             </a>
-            <a href="#dark-mode" id="dark" className="icon" onClick={enableDarkMode}>
+            <a href="#dark-mode" id="dark" className={`icon ${isResponsive ? 'responsive-padding' : ''}`} onClick={enableDarkMode}>
                 <img src="/img/Dark2.png" width="27px" alt="Dark Mode" />
             </a>
 
-            <button className="subMenu" onClick={toggleMenu} aria-label="Toggle Menu" type="button">
+            <a className="subMenu" onClick={toggleMenu} aria-label="Toggle Menu" type="button">
                 <img
                     id="menuIcon"
                     src={`/img/${isResponsive ? 'CloseIcon.png' : 'Hamburger%20Menu%20Icon2.png'}`}
                     width="24px"
                     alt="Menu"
                 />
-            </button>
+            </a>
 
             <div className="search">
                 <form action="#">
