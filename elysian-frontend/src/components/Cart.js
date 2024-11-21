@@ -15,7 +15,7 @@ function Cart() {
     }
 
     if (cart.length === 0) {
-        return <div className="cart-empty">Your cart is empty.</div>;
+        return <div className="cart-empty">Your Cart Is Empty</div>;
     }
 
     const handleCheckout = () => {
@@ -24,7 +24,7 @@ function Cart() {
 
     return (
         <div className="cart-container">
-            <h2>Your Cart</h2>
+            <h2 className="cart-header">Your Cart</h2>
             <ul className="cart-list">
                 {cart.map((item) => (
                     <li key={item.id} className="cart-item">
@@ -32,7 +32,7 @@ function Cart() {
                         <div className="cart-item-details">
                             <h3 className="cart-item-name">{item.name}</h3>
                             <p className="cart-item-brand">Brand: {item.make}</p>
-                            <p className="cart-item-price">Price: ${item.price}</p>
+                            <p className="cart-item-price">Price: ${parseFloat(item.price).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</p>
                             <div className="cart-item-quantity">
                                 <button 
                                     onClick={() => decreaseQuantity(item.id)} 
@@ -52,7 +52,7 @@ function Cart() {
                             </div>
                             <button 
                                 onClick={() => removeFromCart(item.id)} 
-                                className="remove-button"
+                                className="remove-button-cart"
                             >
                                 Remove
                             </button>
@@ -60,7 +60,7 @@ function Cart() {
                     </li>
                 ))}
             </ul>
-            <h3 className="cart-total">Total: ${calculateTotal().toFixed(2)}</h3>
+            <h3 className="cart-total">Total: ${calculateTotal().toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</h3>
             <button className="checkout-button" onClick={handleCheckout}>Proceed to Checkout</button>
         </div>
     );
