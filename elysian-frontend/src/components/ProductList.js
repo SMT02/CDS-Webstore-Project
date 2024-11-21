@@ -23,10 +23,10 @@ function ProductList() {
 
   // Define the products array inside the component
   const products = [
-    { name: 'Chair', image: 'chairmain.jfif', link: '/chairs' },
-    { name: 'Bed', image: 'bedmain.jfif', link: '/beds' },
-    { name: 'Sofa', image: 'sofamain.jfif', link: '/sofas' },
-    { name: 'Table', image: 'tablemain.jfif', link: '/tables' },
+    { name: 'Chairs', image: 'chairmain.jfif', link: '/chairs' },
+    { name: 'Beds', image: 'bedmain.jfif', link: '/beds' },
+    { name: 'Sofas', image: 'sofamain.jfif', link: '/sofas' },
+    { name: 'Tables', image: 'tablemain.jfif', link: '/tables' },
   ];
 
   // Background image URL for the hero section
