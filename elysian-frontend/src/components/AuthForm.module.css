@@ -3,11 +3,12 @@
   width: 100%;
   max-width: 400px;
   padding: 2rem;
-  background-color: #fff;
-  border-radius: 8px;
+  background-color: #ffffff;
+  border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   text-align: center;
   margin: 0 auto;
+  margin-top: 40px;
 }
 
 /* Title styling */
@@ -26,30 +27,34 @@
 
 /* Input styling */
 .auth-input {
-  width: 100%;
+  width: 94%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: none;
+  border-bottom: 2px solid;
+  border-color: #8b8b8b;
+  border-radius: 0;
+  outline: none;
   font-size: 1rem;
 }
 
-/* Button styling with main theme colors */
+/*  
 .auth-button {
   width: 100%;
   padding: 0.75rem;
   font-size: 1rem;
   font-weight: bold;
   color: #fff;
-  background-color: #4CAF50; /* Same color as used elsewhere */
+  background-color: #4CAF50; 
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .auth-button:hover {
-  background-color: #45a049; /* Hover color in line with theme */
+  background-color: #45a049; 
 }
+*/
 
 /* Error/success message styling */
 .auth-message {
@@ -64,30 +69,40 @@
   font-size: 1rem;
   font-weight: bold;
   color: #fff;
-  background-color: #4CAF50;
+  background-color: #6f5b44;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .auth-button:hover {
-  background-color: #45a049;
+  background-color: #90887f;
 }
 
 /* Toggle button styling */
 .toggle-button {
   background: none;
   border: none;
-  color: #4285f4;
+  color: #6f5b44; /* #4285f4 */
   cursor: pointer;
   text-decoration: underline;
   padding: 0;
   font-size: 0.9rem;
+  transition: color 0.3s ease;
 }
 
 .toggle-button:hover {
-  color: #357ae8;
+  color: #90887f; /* #357ae8 */
+  background-color: inherit;
+}
+
+.dashboard-link {
+  color: #6f5b44;
+}
+
+.dashboard-link:hover {
+  color: #90887f;
 }
 
 .vendor-section {
@@ -103,7 +118,7 @@
 }
 
 .vendor-button {
-    background-color: #4a5568;
+    background-color: #444a45; /* #4a5568 */ 
     color: white;
     padding: 0.75rem 1.5rem;
     border-radius: 0.375rem;
@@ -113,7 +128,7 @@
 }
 
 .vendor-button:hover {
-    background-color: #2d3748;
+    background-color: #778078; /* #2d3748 */
 }
 
 .form-footer {
