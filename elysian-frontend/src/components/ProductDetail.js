@@ -33,6 +33,7 @@ function ProductDetail() {
                 setLoading(false);
             });
     }, [id]);
+    
 
     // Fetch reviews from backend for the specific product
     useEffect(() => {
@@ -49,6 +50,20 @@ function ProductDetail() {
                 setReviewsLoading(false);
             });
     }, [id]);
+    
+    // Handle adding product to cart
+    const handleAddToCart = (product) => {
+        addToCart(product);
+        setShowMessage(true);
+        setTimeout(() => setShowMessage(false), 2000); // Hide message after 2 seconds
+    };
+
+    // Handle adding product to wishlist
+    const handleAddToWishlist = (product) => {
+        addToWishlist(product);
+        setShowMessage(true);
+        setTimeout(() => setShowMessage(false), 2000); // Hide message after 2 seconds
+    };
 
     // Calculate the average rating
     const calculateAverageRating = (reviewsList) => {
@@ -114,7 +129,7 @@ function ProductDetail() {
                 <h2 className="product-name">{product.name}</h2>
                 <p className="product-brand">Brand: {product.make}</p>
                 <div className="product-meta">
-                    <p className="product-price">${parseFloat(product.price || 0).toFixed(2)}</p>
+                    <p className="product-price">${parseFloat(product.price || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</p>
                 </div>
 
                 <div className="product-actions">
@@ -148,12 +163,12 @@ function ProductDetail() {
 
                 {/* Review Form - Star Rating & Comments */}
                 <div className="review-form">
-                    <h3>Leave a Review</h3>
+                    <h3 className="review-header">Leave a Review</h3>
                     {renderStars()}
                     <textarea
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
-                        placeholder="Write your comment here"
+                        placeholder="Write your review here"
                         className="review-comment-input"
                     />
                     <button onClick={handleReviewSubmit} className="submit-review-btn">
@@ -163,7 +178,7 @@ function ProductDetail() {
 
                 {/* Customer Reviews Section */}
                 <div className="reviews-section">
-                    <h3>Customer Reviews</h3>
+                    <h3 className="review-header">Customer Reviews</h3>
 
                     {/* Average Rating */}
                     {averageRating > 0 && (
