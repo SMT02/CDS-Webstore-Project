@@ -41,7 +41,7 @@ function Checkout() {
                                     &#x25B2; {/* Up arrow */}
                                 </button>
                             </span>
-                            <span className="price">Price: ${item.price} each</span>
+                            <span className="price">Price: ${parseFloat(item.price).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")} each</span>
                         </div>
                         {/* Trash Icon for Removing Item */}
                         <button 
@@ -64,7 +64,7 @@ function Checkout() {
                 <hr />
                 <div className="subtotal">
                     <span>Subtotal:</span>
-                    <span className="subtotal-amount">${calculateTotal().toFixed(2)}</span>
+                    <span className="subtotal-amount">${calculateTotal().toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</span>
                 </div>
                 <p className="subtotal-note">(Subtotal does not include shipping and processing, gift wrap, discounts or tax.)</p>
                 <button className="checkout-button" onClick={handleSubmit}>CHECK OUT</button>
