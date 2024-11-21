@@ -10,6 +10,7 @@ h2 {
     font-size: 2rem;
     margin-bottom: 20px;
     color: #333;
+    animation: headerAnim 1s ease;
 }
 
 /* Empty state */
@@ -17,6 +18,11 @@ h2 {
     font-size: 1.5rem;
     color: #777;
     text-align: center;
+    margin-top: 40px;
+}
+
+.dark-mode .wishlist-empty {
+    color: #d9d9d9;
 }
 
 /* Wishlist items grid layout */
@@ -35,6 +41,7 @@ h2 {
     display: flex;
     flex-direction: column;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: wishListAnim 1s ease;
 }
 
 .wishlist-item:hover {
@@ -78,10 +85,18 @@ h2 {
     line-height: 1.4;
 }
 
+.dark-mode .wishlist-item-name {
+    color: #333;
+}
+
 .wishlist-item-brand {
     font-size: 1rem;
     color: #777;
     margin: 5px 0;
+}
+
+.dark-mode .wishlist-item-brand {
+    color: #777;
 }
 
 .wishlist-item-price {
@@ -91,19 +106,27 @@ h2 {
     margin: 10px 0;
 }
 
+.dark-mode .wishlist-item-price {
+    color: #333;
+}
+
 .remove-button {
     background-color: #d9534f;
     color: white;
     border: none;
     padding: 8px 15px;
-    border-radius: 4px;
+    border-radius: 10px;
     cursor: pointer;
     font-size: 0.9rem;
     transition: background-color 0.3s ease;
 }
 
 .remove-button:hover {
-    background-color: #c9302c;
+    background-color: #b71c1c;
+}
+
+.dark-mode .remove-button:hover {
+    background-color: #778078;
 }
 
 /* Responsive styles */
