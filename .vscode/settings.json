@@ -1,0 +1,20 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "elysianstuff1",
+            "password": "Adsfjlk;122",
+            "username": "root",
+            "database": "elysiantest",
+            "connectionTimeout": 30
+        }
+    ],
+    "AutoPreview.serverURL": "http://localhost:3000/"
+}
